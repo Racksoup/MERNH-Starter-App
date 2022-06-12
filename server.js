@@ -9,12 +9,14 @@ connectDB();
 app.use(express.json({ extend: false }));
 
 // routes
-// app.use('/api/---', require('./routes/api/---'));
+app.use('/api/admin', require('./routes/api/admin'));
+app.use('/api/users', require('./routes/api/users'));
 
+// production
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static('client/build'));
+  app.use(express.static(path.join(__dirname, 'client', 'dist')));
   app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+    res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'));
   });
 }
 
