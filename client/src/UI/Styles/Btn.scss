@@ -1,0 +1,40 @@
+@mixin btn() {
+  height: 2rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  text-decoration: none;
+  background-color: rgb(185, 126, 67);
+  color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  &:hover {
+    color: rgb(107, 76, 55);
+    border: solid 0.1rem rgb(107, 76, 55);
+  }
+}
+
+.Btn {
+  @include btn;
+  width: 7rem;
+
+  &-1 {
+    @include btn;
+    min-width: 4rem;
+  }
+  &-2 {
+    @include btn;
+    width: 2rem;
+    height: 2rem;
+    background-color: rgb(179, 0, 0);
+    &:hover {
+      color: black;
+      border: solid 0.1rem black;
+      font-size: 1.2rem;
+    }
+  }
+}
