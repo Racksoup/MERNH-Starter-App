@@ -31,51 +31,41 @@ export const userSlice = createSlice({
       state.user = null;
     },
   },
-  extraReducers: (builder) => {
-    builder
-      .addCase(loadAdmin.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(loadAdmin.fulfilled, (state, action) => {
-        userSlice.caseReducers.userLoaded(action.payload);
-      })
-      .addCase(loadAdmin.rejected, (state) => {
-        userSlice.caseReducers.logout();
-      })
-      .addCase(login.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(login.fulfilled, (state, action) => {
-        userSlice.caseReducers.loginSuccess(action.payload);
-        userSlice.caseReducers.loadAdmin();
-      })
-      .addCase(login.rejected, (state) => {
-        userSlice.caseReducers.logout();
-      });
-  },
 });
 
-export const loadAdmin = createAsyncThunk('user/loadAdmin', async () => {
+export const loadUser = () => async (dispatch) => {
   if (localStorage.userToken) {
     setAuthToken(localStorage.userToken);
   }
-  if (localStorage.token) {
-    const res = await axios.get('/api/users');
-    return res.data;
-  }
-});
 
-export const login = createAsyncThunk('user/login', async (username, password) => {
+  try {
+    if (localStorage.userToken) {
+      const res = await axios.get('/api/users');
+      dispatch(userLoaded(res.data));
+    }
+  } catch (error) {
+    console.log(error);
+    dispatch(logout());
+  }
+};
+
+export const login = (form) => async (dispatch, getState) => {
   const config = {
     headers: {
       'Content-Type': 'application/json',
     },
   };
+  const body = JSON.stringify({ username: form.username, password: form.password });
 
-  const body = JSON.stringify({ username, password });
-  const res = await axios.post('/api/users', body, config);
-  return res.data;
-});
+  try {
+    const res = await axios.post('/api/users/userAuth', body, config);
+    dispatch(loginSuccess(res.data));
+    dispatch(loadUser());
+  } catch (error) {
+    console.log(error);
+    dispatch(logout());
+  }
+};
 
 const setAuthToken = (token) => {
   if (token) {

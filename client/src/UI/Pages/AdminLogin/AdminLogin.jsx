@@ -1,18 +1,12 @@
 import React, { useState } from 'react';
 import './AdminLogin.scss';
-import {
-  login,
-  selectIsAuthenticated,
-  selectLoading,
-  selectAdmin,
-} from '../../../Redux/adminSlice';
+import { login, selectIsAuthenticated, selectLoading } from '../../../Redux/adminSlice';
 
 import { useSelector, useDispatch } from 'react-redux';
 
 const AdminLogin = () => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const loading = useSelector(selectLoading);
-  const admin = useSelector(selectAdmin);
   const dispatch = useDispatch();
   const [form, setForm] = useState({
     username: '',
