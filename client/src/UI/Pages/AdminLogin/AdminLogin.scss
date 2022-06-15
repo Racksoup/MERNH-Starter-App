@@ -2,7 +2,8 @@
 
 .AdminLogin {
   @include Section;
-  margin-top: 10rem;
+  margin-top: 5rem;
+  margin-bottom: 5rem;
 
   .Title {
     font-size: 2.2rem;
@@ -21,6 +22,7 @@
     }
 
     .Input {
+      background-color: white;
       margin-top: 0.4rem;
       width: 100%;
       border: none;

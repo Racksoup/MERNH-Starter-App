@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 const initialState = {
@@ -7,6 +7,11 @@ const initialState = {
   loading: true,
   user: null,
 };
+
+export const selectToken = (state) => state.user.token;
+export const selectIsAuthenticated = (state) => state.user.isAuthenticated;
+export const selectLoading = (state) => state.user.loading;
+export const selectUser = (state) => state.user.user;
 
 export const userSlice = createSlice({
   name: 'user',
@@ -55,7 +60,7 @@ export const login = (form) => async (dispatch, getState) => {
       'Content-Type': 'application/json',
     },
   };
-  const body = JSON.stringify({ username: form.username, password: form.password });
+  const body = JSON.stringify({ name: form.name, password: form.password });
 
   try {
     const res = await axios.post('/api/users/userAuth', body, config);
@@ -64,6 +69,28 @@ export const login = (form) => async (dispatch, getState) => {
   } catch (error) {
     console.log(error);
     dispatch(logout());
+  }
+};
+
+export const createUser = (user) => async (dispatch, getState) => {
+  console.log('hit');
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+  const body = JSON.stringify({
+    email: user.email,
+    name: user.name,
+    password: user.password,
+  });
+
+  try {
+    const res = await axios.post('/api/users', body, config);
+    dispatch(loginSuccess(res.data));
+    dispatch(loadUser());
+  } catch (error) {
+    console.log(error);
   }
 };
 

@@ -1,22 +1,22 @@
 import React, { useState } from 'react';
-import './UserLogin.scss';
-import { login, selectIsAuthenticated, selectLoading } from '../../../Redux/userSlice';
+import './CreateUser.scss';
+import { createUser, selectIsAuthenticated } from '../../../Redux/userSlice';
 
 import { useSelector, useDispatch } from 'react-redux';
-import { Navigate, Link } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
-const AdminLogin = () => {
-  const isAuthenticated = useSelector(selectIsAuthenticated);
-  const loading = useSelector(selectLoading);
-  const dispatch = useDispatch();
+const CreateUser = () => {
   const [form, setForm] = useState({
-    username: '',
+    name: '',
+    email: '',
     password: '',
   });
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
 
   const submitForm = (e) => {
     e.preventDefault();
-    dispatch(login(form));
+    dispatch(createUser(form));
   };
 
   if (isAuthenticated) {
@@ -24,16 +24,24 @@ const AdminLogin = () => {
   }
 
   return (
-    <div className='UserLogin'>
-      <h1 className='Title'>Login</h1>
+    <div className='CreateUser'>
+      <h1 className='Title'>Create Account</h1>
       <form className='Form' onSubmit={(e) => submitForm(e)}>
+        <label htmlFor='' className='Label'>
+          Email
+        </label>
+        <input
+          type='text'
+          className='Input'
+          onChange={(e) => setForm({ ...form, email: e.target.value })}
+        />
         <label htmlFor='' className='Label'>
           Username
         </label>
         <input
           type='text'
           className='Input'
-          onChange={(e) => setForm({ ...form, username: e.target.value })}
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
         />
         <label htmlFor='' className='Label'>
           Password
@@ -45,11 +53,8 @@ const AdminLogin = () => {
         />
         <input type='submit' className='Btn' />
       </form>
-      <Link to='/create-user' className='Link'>
-        <button className='CreateUserLink'>Create Account</button>
-      </Link>
     </div>
   );
 };
 
-export default AdminLogin;
+export default CreateUser;

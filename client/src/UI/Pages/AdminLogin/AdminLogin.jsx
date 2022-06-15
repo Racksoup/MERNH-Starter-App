@@ -3,6 +3,7 @@ import './AdminLogin.scss';
 import { login, selectIsAuthenticated, selectLoading } from '../../../Redux/adminSlice';
 
 import { useSelector, useDispatch } from 'react-redux';
+import { Navigate } from 'react-router-dom';
 
 const AdminLogin = () => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
@@ -17,6 +18,10 @@ const AdminLogin = () => {
     e.preventDefault();
     dispatch(login(form));
   };
+
+  if (isAuthenticated) {
+    return <Navigate to='/admin-dashboard' />;
+  }
 
   return (
     <div className='AdminLogin'>
