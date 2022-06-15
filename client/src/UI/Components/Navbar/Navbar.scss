@@ -50,10 +50,25 @@ $navColorBottom: rgb(28, 38, 50);
 
         &Box {
           display: none;
+          flex-direction: column;
           position: absolute;
+          margin-top: 0.5rem;
+          margin-left: -1rem;
+          border: solid rgba(100, 100, 100, 0.5) 0.1rem;
         }
 
         &Item {
+          cursor: pointer;
+          height: 1.7rem;
+          width: 5rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: black;
+
+          &:hover {
+            border: solid rgba(100, 100, 100, 0.5) 0.1rem;
+          }
         }
       }
 
@@ -61,6 +76,7 @@ $navColorBottom: rgb(28, 38, 50);
         width: calc(100% - 6.4rem);
         padding: 0 0 0 0.7rem;
         font-size: 1rem;
+        background-color: rgb(28, 28, 28);
       }
 
       .SearchButton {
