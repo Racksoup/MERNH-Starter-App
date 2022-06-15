@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 const initialState = {
@@ -7,6 +7,11 @@ const initialState = {
   loading: true,
   admin: null,
 };
+
+export const selectToken = (state) => state.admin.token;
+export const selectIsAuthenticated = (state) => state.admin.isAuthenticated;
+export const selectLoading = (state) => state.admin.loading;
+export const selectAdmin = (state) => state.admin.admin;
 
 export const adminSlice = createSlice({
   name: 'admin',
@@ -18,6 +23,7 @@ export const adminSlice = createSlice({
       state.admin = action.payload;
     },
     loginSuccess: (state, action) => {
+      console.log(action);
       localStorage.setItem('adminToken', action.payload.token);
       state.isAuthenticated = true;
       state.loading = false;
@@ -31,51 +37,41 @@ export const adminSlice = createSlice({
       state.admin = null;
     },
   },
-  extraReducers: (builder) => {
-    builder
-      .addCase(loadAdmin.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(loadAdmin.fulfilled, (state, action) => {
-        adminSlice.caseReducers.adminLoaded(action.payload);
-      })
-      .addCase(loadAdmin.rejected, (state) => {
-        adminSlice.caseReducers.logout();
-      })
-      .addCase(login.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(login.fulfilled, (state, action) => {
-        adminSlice.caseReducers.loginSuccess(action.payload);
-        adminSlice.caseReducers.loadAdmin();
-      })
-      .addCase(login.rejected, (state) => {
-        adminSlice.caseReducers.logout();
-      });
-  },
 });
 
-export const loadAdmin = createAsyncThunk('admin/loadAdmin', async () => {
+export const loadAdmin = () => async (dispatch) => {
   if (localStorage.adminToken) {
     setAuthToken(localStorage.adminToken);
   }
-  if (localStorage.token) {
-    const res = await axios.get('/api/admin');
-    return res.data;
-  }
-});
 
-export const login = createAsyncThunk('admin/login', async (username, password) => {
+  try {
+    if (localStorage.adminToken) {
+      const res = await axios.get('/api/admin');
+      dispatch(adminLoaded(res.data));
+    }
+  } catch (error) {
+    console.log(error);
+    dispatch(logout());
+  }
+};
+
+export const login = (form) => async (dispatch, getState) => {
   const config = {
     headers: {
       'Content-Type': 'application/json',
     },
   };
+  const body = JSON.stringify({ username: form.username, password: form.password });
 
-  const body = JSON.stringify({ username, password });
-  const res = await axios.post('/api/admin', body, config);
-  return res.data;
-});
+  try {
+    const res = await axios.post('/api/admin/adminAuth', body, config);
+    dispatch(loginSuccess(res.data));
+    dispatch(loadAdmin());
+  } catch (error) {
+    console.log(error);
+    dispatch(logout());
+  }
+};
 
 const setAuthToken = (token) => {
   if (token) {

@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 const initialState = {
@@ -7,6 +7,11 @@ const initialState = {
   loading: true,
   user: null,
 };
+
+export const selectToken = (state) => state.user.token;
+export const selectIsAuthenticated = (state) => state.user.isAuthenticated;
+export const selectLoading = (state) => state.user.loading;
+export const selectUser = (state) => state.user.user;
 
 export const userSlice = createSlice({
   name: 'user',
@@ -31,51 +36,63 @@ export const userSlice = createSlice({
       state.user = null;
     },
   },
-  extraReducers: (builder) => {
-    builder
-      .addCase(loadAdmin.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(loadAdmin.fulfilled, (state, action) => {
-        userSlice.caseReducers.userLoaded(action.payload);
-      })
-      .addCase(loadAdmin.rejected, (state) => {
-        userSlice.caseReducers.logout();
-      })
-      .addCase(login.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(login.fulfilled, (state, action) => {
-        userSlice.caseReducers.loginSuccess(action.payload);
-        userSlice.caseReducers.loadAdmin();
-      })
-      .addCase(login.rejected, (state) => {
-        userSlice.caseReducers.logout();
-      });
-  },
 });
 
-export const loadAdmin = createAsyncThunk('user/loadAdmin', async () => {
+export const loadUser = () => async (dispatch) => {
   if (localStorage.userToken) {
     setAuthToken(localStorage.userToken);
   }
-  if (localStorage.token) {
-    const res = await axios.get('/api/users');
-    return res.data;
-  }
-});
 
-export const login = createAsyncThunk('user/login', async (username, password) => {
+  try {
+    if (localStorage.userToken) {
+      const res = await axios.get('/api/users');
+      dispatch(userLoaded(res.data));
+    }
+  } catch (error) {
+    console.log(error);
+    dispatch(logout());
+  }
+};
+
+export const login = (form) => async (dispatch, getState) => {
   const config = {
     headers: {
       'Content-Type': 'application/json',
     },
   };
+  const body = JSON.stringify({ name: form.name, password: form.password });
 
-  const body = JSON.stringify({ username, password });
-  const res = await axios.post('/api/users', body, config);
-  return res.data;
-});
+  try {
+    const res = await axios.post('/api/users/userAuth', body, config);
+    dispatch(loginSuccess(res.data));
+    dispatch(loadUser());
+  } catch (error) {
+    console.log(error);
+    dispatch(logout());
+  }
+};
+
+export const createUser = (user) => async (dispatch, getState) => {
+  console.log('hit');
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+  const body = JSON.stringify({
+    email: user.email,
+    name: user.name,
+    password: user.password,
+  });
+
+  try {
+    const res = await axios.post('/api/users', body, config);
+    dispatch(loginSuccess(res.data));
+    dispatch(loadUser());
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 const setAuthToken = (token) => {
   if (token) {
